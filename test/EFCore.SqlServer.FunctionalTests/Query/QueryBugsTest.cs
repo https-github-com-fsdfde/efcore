@@ -9142,7 +9142,7 @@ FROM [CycleC] AS [c]");
         #region Issue23211
 
         [ConditionalFact]
-        public virtual void Collection_include_on_owner_with_owned_type_mapped_to_different_table()
+        public virtual void Collection_include_on_owner_with_two_owned_types_mapped_to_different_table()
         {
             using (CreateDatabase23211())
             {
@@ -9178,6 +9178,40 @@ ORDER BY [t].[Id]");
             }
         }
 
+        [ConditionalFact]
+        public virtual void Collection_include_on_owner_with_owned_type_mapped_to_different_table()
+        {
+            using (CreateDatabase23211())
+            {
+                using var context = new MyContext23211(_options);
+
+                var owner = context.Set<SecondOwner23211>().Include(e => e.Dependents).AsSplitQuery().OrderBy(e => e.Id).Single();
+                Assert.NotNull(owner.Dependents);
+                Assert.Equal(2, owner.Dependents.Count);
+                Assert.NotNull(owner.Owned);
+                Assert.Equal("A", owner.Owned.Value);
+
+                AssertSql(
+                    @"SELECT [t].[Id], [t].[SecondOwner23211Id], [t].[Value]
+FROM (
+    SELECT TOP(2) [s].[Id], [o].[SecondOwner23211Id], [o].[Value]
+    FROM [SecondOwner23211] AS [s]
+    LEFT JOIN [Owned23211] AS [o] ON [s].[Id] = [o].[SecondOwner23211Id]
+    ORDER BY [s].[Id]
+) AS [t]
+ORDER BY [t].[Id]",
+                    //
+                    @"SELECT [s0].[Id], [s0].[SecondOwner23211Id], [t].[Id]
+FROM (
+    SELECT TOP(1) [s].[Id]
+    FROM [SecondOwner23211] AS [s]
+    ORDER BY [s].[Id]
+) AS [t]
+INNER JOIN [SecondDependent23211] AS [s0] ON [t].[Id] = [s0].[SecondOwner23211Id]
+ORDER BY [t].[Id]");
+            }
+        }
+
         private class Owner23211
         {
             public int Id { get; set; }
@@ -9196,6 +9230,18 @@ ORDER BY [t].[Id]");
             public int Id { get; set; }
         }
 
+        private class SecondOwner23211
+        {
+            public int Id { get; set; }
+            public List<SecondDependent23211> Dependents { get; set; }
+            public OwnedType23211 Owned { get; set; }
+        }
+
+        private class SecondDependent23211
+        {
+            public int Id { get; set; }
+        }
+
         private class MyContext23211 : DbContext
         {
             public MyContext23211(DbContextOptions options)
@@ -9207,6 +9253,7 @@ ORDER BY [t].[Id]");
             {
                 modelBuilder.Entity<Owner23211>().OwnsOne(e => e.Owned1, b => b.ToTable("Owned123211"));
                 modelBuilder.Entity<Owner23211>().OwnsOne(e => e.Owned2, b => b.ToTable("Owned223211"));
+                modelBuilder.Entity<SecondOwner23211>().OwnsOne(e => e.Owned, b => b.ToTable("Owned23211"));
             }
         }
 
@@ -9224,6 +9271,16 @@ ORDER BY [t].[Id]");
                         },
                         Owned1 = new OwnedType23211 { Value = "A" },
                         Owned2 = new OwnedType23211 { Value = "B" }
+                    });
+
+                    context.Add(new SecondOwner23211
+                    {
+                        Dependents = new List<SecondDependent23211>
+                        {
+                            new SecondDependent23211(),
+                            new SecondDependent23211()
+                        },
+                        Owned = new OwnedType23211 { Value = "A" }
                     });
 
                     context.SaveChanges();
