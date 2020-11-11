@@ -1388,7 +1388,7 @@ namespace Microsoft.EntityFrameworkCore.Query.SqlExpressions
                 var identifierFromParent = _identifier;
                 if (innerSelectExpression.Tables.LastOrDefault(e => e is InnerJoinExpression) is InnerJoinExpression
                         collectionInnerJoinExpression
-                    && collectionInnerJoinExpression.Table is SelectExpression collectionInnerSelectExpression)
+                    && collectionInnerJoinExpression.Table is TableExpressionBase collectionTableExpressionBase)
                 {
                     // This computes true parent identifier count for correlation.
                     // The last inner joined table in innerSelectExpression brings collection data.
@@ -1396,7 +1396,7 @@ namespace Microsoft.EntityFrameworkCore.Query.SqlExpressions
                     // So identifier not coming from there (which would be at the start only) are for correlation with parent.
                     // Parent can have additional identifier if a owned reference was expanded.
                     var actualParentIdentifierCount = innerSelectExpression._identifier
-                        .TakeWhile(e => !ReferenceEquals(e.Column.Table, collectionInnerSelectExpression))
+                        .TakeWhile(e => !ReferenceEquals(e.Column.Table, collectionTableExpressionBase))
                         .Count();
                     identifierFromParent = _identifier.Take(actualParentIdentifierCount).ToList();
                 }
