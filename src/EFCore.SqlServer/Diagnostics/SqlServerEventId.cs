@@ -28,6 +28,7 @@ namespace Microsoft.EntityFrameworkCore.Diagnostics
             ByteIdentityColumnWarning,
             ConflictingValueGenerationStrategiesWarning,
             DecimalTypeKeyWarning,
+            SavepointsDisabledBecauseOfMARS,
 
             // Scaffolding events
             ColumnFound = CoreEventId.ProviderDesignBaseId,
@@ -211,5 +212,16 @@ namespace Microsoft.EntityFrameworkCore.Diagnostics
         ///     This event is in the <see cref="DbLoggerCategory.Scaffolding" /> category.
         /// </summary>
         public static readonly EventId ReflexiveConstraintIgnored = MakeScaffoldingId(Id.ReflexiveConstraintIgnored);
+
+        /// <summary>
+        ///     <para>
+        ///         Savepoints have been disabled when saving changes with an external transaction, because Multiple Active Result Sets is
+        ///         enabled.
+        ///     </para>
+        ///     <para>
+        ///         This event is in the <see cref="DbLoggerCategory.Database.Transaction" /> category.
+        ///     </para>
+        /// </summary>
+        public static readonly EventId SavepointsDisabledBecauseOfMARS = MakeValidationId(Id.SavepointsDisabledBecauseOfMARS);
     }
 }
