@@ -31,5 +31,5 @@ stages:
               - task: PowerShell@2
                 inputs:
                   filePath: $(Build.SourcesDirectory)\eng\common\build.ps1
-                  arguments: -restore -build -ci
+                  arguments: -warnAsError $false -restore -build -ci
                 displayName: Build
