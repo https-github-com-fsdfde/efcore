@@ -1450,6 +1450,23 @@ FROM [Orders] AS [o]
 LEFT JOIN [Customers] AS [c] ON [o].[CustomerID] = [c].[CustomerID]");
         }
 
+        public override async Task Ternary_in_client_eval_assings_correct_types(bool async)
+        {
+            await base.Ternary_in_client_eval_assings_correct_types(async);
+
+            AssertSql(
+                @"SELECT [o].[CustomerID], CASE
+    WHEN [o].[OrderDate] IS NOT NULL THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END, [o].[OrderDate], [o].[OrderID] - 10000, CASE
+    WHEN [o].[OrderDate] IS NULL THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+FROM [Orders] AS [o]
+WHERE [o].[OrderID] < 10300
+ORDER BY [o].[OrderID]");
+        }
+
         private void AssertSql(params string[] expected)
             => Fixture.TestSqlLoggerFactory.AssertBaseline(expected);
 

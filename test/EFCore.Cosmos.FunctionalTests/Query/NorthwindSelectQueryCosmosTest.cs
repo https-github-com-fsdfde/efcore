@@ -1168,6 +1168,17 @@ ORDER BY c[""CustomerID""]");
             return base.Select_nested_collection_deep(async);
         }
 
+        public override async Task Ternary_in_client_eval_assings_correct_types(bool async)
+        {
+            await base.Ternary_in_client_eval_assings_correct_types(async);
+
+            AssertSql(
+                @"SELECT VALUE {""CustomerID"" : c[""CustomerID""], ""OrderDate"" : c[""OrderDate""], ""c"" : (c[""OrderID""] - 10000)}
+FROM root c
+WHERE ((c[""Discriminator""] = ""Order"") AND (c[""OrderID""] < 10300))
+ORDER BY c[""OrderID""]");
+        }
+
         private void AssertSql(params string[] expected)
             => Fixture.TestSqlLoggerFactory.AssertBaseline(expected);
 
