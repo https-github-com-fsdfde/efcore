@@ -88,7 +88,7 @@ stages:
                     arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
                   env:
                     Token: $(dn-bot-dnceng-artifact-feeds-rw)
-              - script: eng\common\cibuild.cmd -warnAsError $false -configuration $(_BuildConfig) -prepareMachine $(_InternalBuildArgs) $(_InternalRuntimeDownloadArgs)
+              - script: eng\cibuild.cmd -configuration $(_BuildConfig) -prepareMachine $(_InternalBuildArgs) $(_InternalRuntimeDownloadArgs)
                 env:
                   Test__Cosmos__DefaultConnection: $(_CosmosConnectionUrl)
                 name: Build
@@ -115,7 +115,7 @@ stages:
                     arguments: $(Build.SourcesDirectory)/NuGet.config $Token
                   env:
                     Token: $(dn-bot-dnceng-artifact-feeds-rw)
-              - script: eng/common/cibuild.sh --warnAsError false --configuration $(_BuildConfig) --prepareMachine $(_InternalRuntimeDownloadArgs)
+              - script: eng/cibuild.sh --configuration $(_BuildConfig) --prepareMachine $(_InternalRuntimeDownloadArgs)
                 env:
                   Test__Cosmos__DefaultConnection: $(_CosmosConnectionUrl)
                 name: Build
@@ -160,7 +160,7 @@ stages:
                     arguments: $(Build.SourcesDirectory)/NuGet.config $Token
                   env:
                     Token: $(dn-bot-dnceng-artifact-feeds-rw)
-              - script: eng/common/cibuild.sh --warnAsError false --configuration $(_BuildConfig) --prepareMachine $(_InternalRuntimeDownloadArgs)
+              - script: eng/cibuild.sh --configuration $(_BuildConfig) --prepareMachine $(_InternalRuntimeDownloadArgs)
                 env:
                   Test__Cosmos__DefaultConnection: $(_CosmosConnectionUrl)
                   Test__Cosmos__AuthToken: $(_CosmosToken)
