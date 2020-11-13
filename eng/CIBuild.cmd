@@ -1,2 +1,2 @@
 @echo off
-"%dp0common\CIBuild.cmd" -warnAsError $false %*
+powershell -ExecutionPolicy ByPass -NoProfile -command "& """%~dp0Build.ps1""" -restore -build -test -sign -pack -publish -ci %*"
