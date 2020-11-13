@@ -660,5 +660,29 @@ namespace Microsoft.EntityFrameworkCore.SqlServer.Internal
 
             return (EventDefinition<string, string>)definition;
         }
+
+        /// <summary>
+        ///     Savepoints are disabled because Multiple Active Result Sets is enabled. When saving changes, the transaction will not be rolled back if error occurs, and may be left in an unknown state. See https://docs.microsoft.com/en-us/ef/core/saving/transactions#savepoints for more information. To identify the code which triggers this warning, call 'ConfigureWarnings(w =&gt; w.Throw(RelationalEventId.SavepointsDisabledBecauseOfMARS))'.
+        /// </summary>
+        public static EventDefinition LogSavepointsDisabledBecauseOfMARS([NotNull] IDiagnosticsLogger logger)
+        {
+            var definition = ((Diagnostics.Internal.SqlServerLoggingDefinitions)logger.Definitions).LogSavepointsDisabledBecauseOfMARS;
+            if (definition == null)
+            {
+                definition = LazyInitializer.EnsureInitialized<EventDefinitionBase>(
+                    ref ((Diagnostics.Internal.SqlServerLoggingDefinitions)logger.Definitions).LogSavepointsDisabledBecauseOfMARS,
+                    () => new EventDefinition(
+                        logger.Options,
+                        SqlServerEventId.SavepointsDisabledBecauseOfMARS,
+                        LogLevel.Warning,
+                        "SqlServerEventId.SavepointsDisabledBecauseOfMARS",
+                        level => LoggerMessage.Define(
+                            level,
+                            SqlServerEventId.SavepointsDisabledBecauseOfMARS,
+                            _resourceManager.GetString("LogSavepointsDisabledBecauseOfMARS"))));
+            }
+
+            return (EventDefinition)definition;
+        }
     }
 }
